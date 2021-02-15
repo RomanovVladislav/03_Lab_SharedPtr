@@ -1,4 +1,6 @@
-// Copyright 2020 Your Name <your_email>
+//
+// Created by vladislav on 01.02.2021.
+//
 
 #include <SharedPtr.hpp>
 #include <gtest/gtest.h>
@@ -8,115 +10,142 @@ TEST(Example, EmptyTest)
     EXPECT_TRUE(true);
 }
 
-TEST(test_constructor, point_nullptr)
+TEST(TestConstructor, PtrNullptr)
 {
-    SharedPtr <int> ptr;
-    int* tmp = ptr.get();
-    EXPECT_EQ(tmp, nullptr);
+    SharedPtr <int> Ptr;
+
+    int* Tmp = Ptr.get();
+
+    EXPECT_EQ(Tmp, nullptr);
 }
 
-TEST(test_constructor, point_int_nullptr)
+TEST(TestConstructor, PtrInt)
 {
-    int *points = new int (24);
-    SharedPtr <int> ptr(points);
-    int* tmp = ptr.get();
-    EXPECT_EQ(tmp, points);
+    int *_Ptr = new int (100);
+
+    SharedPtr <int> Ptr(_Ptr);
+    int* Tmp = Ptr.get();
+
+    EXPECT_EQ(Tmp, _Ptr);
 }
 
-TEST(test_method, test_get)
-{
-    int *points = nullptr;
-    SharedPtr <int> ptr(points);
-    int* tmp = ptr.get();
-    EXPECT_EQ(tmp, nullptr);
-}
-
-TEST(test_method, test_get_int)
-{
-    int *points = new int (227);
-    SharedPtr <int> ptr(points);
-    SharedPtr <int> ptr2 = ptr;
-    EXPECT_EQ(ptr.get(), points);
-}
-
-TEST(test_operator, bool_test)
-{
-    int *points = new int (227);
-    SharedPtr <int> ptr(points);
-    SharedPtr <int> ptr2 = ptr;
-    bool is_pointer = ptr2;
-    EXPECT_EQ(is_pointer, true);
-}
-
-class Test_class
+class TestClass
 {
 public:
-    int x;
+    int Tmp;
 };
 
-TEST(test_operator, arrow_test)
+TEST(TestOperator, arrow_test)
 {
-    auto test_class_ptr = new Test_class;
-    test_class_ptr ->x = 227;
-    SharedPtr <Test_class> ptr(test_class_ptr);
-    EXPECT_EQ(ptr->x, test_class_ptr->x);
+    auto _TestClass = new TestClass;
+    _TestClass ->Tmp = 100;
+
+    SharedPtr <TestClass> Ptr(_TestClass);
+
+    EXPECT_EQ(Ptr->Tmp, _TestClass->Tmp);
 }
 
-TEST(test_operator, equality_lvalue_test)
+TEST(TestConstructor, Lvalue)
 {
-    int *points = new int (227);
-    SharedPtr <int> ptr(points);
-    SharedPtr <int> ptr2;
-    SharedPtr <int> ptr3 = ptr2 = ptr;
-    EXPECT_EQ(ptr3.get(), ptr.get());
+    int *_Ptr = new int (227);
+
+    SharedPtr <int> Ptr1(_Ptr);
+    SharedPtr <int> Ptr2(Ptr1);
+    SharedPtr <int> Ptr3 = Ptr2;
+
+    EXPECT_EQ(Ptr3.get(), Ptr1.get());
 }
 
-TEST(test_constructor, rvalue_test)
+TEST(TestConstructor, Rvalue)
 {
-    int *points = new int (227);
-    SharedPtr <int> ptr(points);
-    SharedPtr <int> ptr2 = ptr;
-    SharedPtr <int> ptr3(std::move(ptr));
-    EXPECT_EQ(ptr3.use_count(), 2);
+    int *_Ptr = new int;
+
+    SharedPtr <int> Ptr1(_Ptr);
+    SharedPtr <int> Ptr2 = Ptr1;
+    SharedPtr <int> Ptr3(std::move(Ptr1));
+
+    EXPECT_EQ(Ptr3.use_count(), 2);
 }
 
-TEST(test_method, reset_test)
+TEST(TestMethod, GetNullptr)
 {
-    int  *points = new int (227);
-    SharedPtr <int> ptr(points);
-    ptr.reset();
-    EXPECT_EQ(ptr.get(), nullptr);
+    int *_Ptr = nullptr;
+
+    SharedPtr <int> Ptr(_Ptr);
+    int* Tmp = Ptr.get();
+
+    EXPECT_EQ(Tmp, nullptr);
 }
 
-TEST(test_method, reset_test_point)
+TEST(TestMethod, GetInt)
 {
-    int *points = new int (227);
-    int *points1 = new int (200);
-    SharedPtr <int> ptr(points);
-    ptr.reset(points1);
-    EXPECT_EQ(ptr.get(), points1);
+    int *_Ptr = new int (100);
+
+    SharedPtr <int> Ptr1(_Ptr);
+    SharedPtr <int> Ptr2 = Ptr1;
+
+    EXPECT_EQ(Ptr2.get(), _Ptr);
 }
 
-TEST(test_method, swap_test)
+TEST(TestMethod, Reset1)
 {
-    int *points = new int (227);
-    int *points1 = new int (200);
-    SharedPtr <int> ptr(points);
-    SharedPtr <int> ptr1(points1);
-    ptr.swap(ptr1);
-    EXPECT_EQ(ptr.get(), points1);
-    EXPECT_EQ(ptr1.get(), points);
+    int  *_Ptr = new int (100);
+
+    SharedPtr <int> Ptr(_Ptr);
+    Ptr.reset();
+
+    EXPECT_EQ(Ptr.get(), nullptr);
 }
 
-TEST(test_is_move, assign_construct_test)
+TEST(TestMethod, Reset2)
+{
+    int *_Ptr1 = new int (100);
+    int *_Ptr2 = new int (200);
+
+    SharedPtr <int> Ptr(_Ptr1);
+    Ptr.reset(_Ptr2);
+
+    EXPECT_EQ(Ptr.get(), _Ptr2);
+}
+
+TEST(TestMethod, Swap)
+{
+    int *_Ptr1 = new int (100);
+    int *_Ptr2 = new int (200);
+
+    SharedPtr <int> Ptr1(_Ptr1);
+    SharedPtr <int> Ptr2(_Ptr2);
+    Ptr1.swap(Ptr2);
+
+    EXPECT_EQ(Ptr1.get(), _Ptr2);
+    EXPECT_EQ(Ptr2.get(), _Ptr1);
+}
+
+TEST(TestOperator, Bool)
+{
+    int *_Ptr = new int (100);
+
+    SharedPtr <int> Ptr1(_Ptr);
+    SharedPtr <int> Ptr2 = Ptr1;
+    bool Tmp = Ptr2;
+
+    EXPECT_EQ(Tmp, true);
+}
+
+TEST(TestIs_move, is_move_assignable)
 {
     EXPECT_EQ(std::is_move_assignable<SharedPtr<int>>::value, true);
-    EXPECT_EQ(std::is_move_constructible<SharedPtr<int>>::value, true);
+
     EXPECT_EQ(std::is_move_assignable<SharedPtr<double>>::value, true);
-    EXPECT_EQ(std::is_move_constructible<SharedPtr<double>>::value,
-              true);
-    EXPECT_EQ(std::is_move_assignable<SharedPtr<Test_class>>::value,
-              true);
-    EXPECT_EQ(std::is_move_constructible<SharedPtr<Test_class>>::value,
-              true);
+
+    EXPECT_EQ(std::is_move_assignable<SharedPtr<TestClass>>::value, true);
+}
+
+TEST(TestIs_move, is_move_constructible)
+{
+    EXPECT_EQ(std::is_move_constructible<SharedPtr<int>>::value, true);
+
+    EXPECT_EQ(std::is_move_constructible<SharedPtr<double>>::value, true);
+
+    EXPECT_EQ(std::is_move_constructible<SharedPtr<TestClass>>::value, true);
 }

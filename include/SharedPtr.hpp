@@ -13,99 +13,101 @@ template <typename T>
 
 class SharedPtr
 {
+
 public:
+
     SharedPtr()
     {
-        ptr = nullptr;
-        count_ptr = nullptr;
+        _Ptr = nullptr;
+        _NumberOfPtr = nullptr;
     }
 
-    explicit SharedPtr(T* point)
+    explicit SharedPtr(T* Ptr)
     {
-        ptr = point;
-        if (point == nullptr)
+        _Ptr = Ptr;
+        if (Ptr == nullptr)
         {
-            count_ptr = nullptr;
+            _NumberOfPtr = nullptr;
         }
         else
         {
-            count_ptr = new std::atomic_uint;
-            *count_ptr = 1;
+            _NumberOfPtr = new std::atomic_uint;
+            *_NumberOfPtr = 1;
         }
     }
 
-    SharedPtr(const SharedPtr& r)
+    SharedPtr(const SharedPtr& Object)
     {
-        ptr = r.ptr;
-        count_ptr = r.count_ptr;
-        if (ptr)
+        _Ptr = Object._Ptr;
+        _NumberOfPtr = Object._NumberOfPtr;
+        if (_Ptr)
         {
-            *count_ptr = *count_ptr + 1;
+            *_NumberOfPtr = *_NumberOfPtr + 1;
         }
         else
         {
-            count_ptr = nullptr;
+            _NumberOfPtr = nullptr;
         }
     }
 
-    SharedPtr(SharedPtr&& r)
+    SharedPtr(SharedPtr&& Object)
     {
-        ptr = r.ptr;
-        count_ptr = r.count_ptr;
+        _Ptr = Object._Ptr;
+        _NumberOfPtr = Object._NumberOfPtr;
 
-        r.ptr = nullptr;
-        r.count_ptr = nullptr;
+        Object._Ptr = nullptr;
+        Object._NumberOfPtr = nullptr;
     }
 
     ~SharedPtr()
     {
-        if (count_ptr)
+        if (_NumberOfPtr)
         {
-            if (*count_ptr == 1)
+            if (*_NumberOfPtr == 1)
             {
-                delete ptr;
-                delete count_ptr;
+                delete _Ptr;
+                delete _NumberOfPtr;
             }
             else
             {
-                *count_ptr = *count_ptr - 1;
+                *_NumberOfPtr = *_NumberOfPtr - 1;
             }
         }
-        ptr = nullptr;
-        count_ptr = nullptr;
+        _Ptr = nullptr;
+        _NumberOfPtr = nullptr;
     }
 
-    auto operator=(const SharedPtr& r) -> SharedPtr&
+    auto operator=(const SharedPtr& Object) -> SharedPtr&
     {
-        if (this != &r)
+        if (this != &Object)
         {
-            ptr = r.ptr;
-            count_ptr = r.count_ptr;
-            if (ptr)
+            _Ptr = Object._Ptr;
+            _NumberOfPtr = Object._NumberOfPtr;
+            if (_Ptr)
             {
-                *count_ptr = *count_ptr + 1;
+                *_NumberOfPtr = *_NumberOfPtr + 1;
             }
             else
             {
-                count_ptr = nullptr;
+                _NumberOfPtr = nullptr;
             }
         }
         return *this;
     }
 
-    auto operator=(SharedPtr&& r) -> SharedPtr&
+    auto operator=(SharedPtr&& Object) -> SharedPtr&
     {
-        if (this != &r)
+        if (this != &Object)
         {
-            ptr = r.ptr;
-            count_ptr = r.count_ptr;
+            _Ptr = Object._Ptr;
+            _NumberOfPtr = Object._NumberOfPtr;
         }
         return *this;
     }
 
     operator bool() const
     {
-        if (ptr)
+        if (_Ptr)
         {
             return true;
         }
@@ -117,9 +119,9 @@ public:
 
     auto operator*() const -> T&
     {
-        if (ptr)
+        if (_Ptr)
         {
-            return *ptr;
+            return *_Ptr;
         }
         else
         {
@@ -129,68 +131,68 @@ public:
 
     auto operator->() const -> T*
     {
-        return ptr;
+        return _Ptr;
     }
 
     auto get() -> T*
     {
-        return ptr;
+        return _Ptr;
     }
 
     void reset()
     {
-        if (*count_ptr == 1)
+        if (*_NumberOfPtr == 1)
         {
-            delete ptr;
-            delete count_ptr;
+            delete _Ptr;
+            delete _NumberOfPtr;
         }
         else
         {
-            *count_ptr = *count_ptr - 1;
+            *_NumberOfPtr = *_NumberOfPtr - 1;
         }
 
-        ptr = nullptr;
-        count_ptr = nullptr;
+        _Ptr = nullptr;
+        _NumberOfPtr = nullptr;
     }
 
-    void reset(T* point)
+    void reset(T* Ptr)
     {
-        if (*count_ptr == 1)
+        if (*_NumberOfPtr == 1)
         {
-            delete ptr;
-            delete count_ptr;
+            delete _Ptr;
+            delete _NumberOfPtr;
         }
         else
         {
-            *count_ptr = *count_ptr - 1;
+            *_NumberOfPtr = *_NumberOfPtr - 1;
         }
-        ptr = point;
-        if (point == nullptr)
+        _Ptr = Ptr;
+        if (Ptr == nullptr)
         {
-            count_ptr = nullptr;
+            _NumberOfPtr = nullptr;
         }
         else
         {
-            count_ptr = new std::atomic_uint;
-            *count_ptr = 1;
+            _NumberOfPtr = new std::atomic_uint;
+            *_NumberOfPtr = 1;
         }
     }
 
-    void swap(SharedPtr& r)
+    void swap(SharedPtr& Object)
     {
-        T* tmp_ptr(std::move(r.ptr));
-        r.ptr = std::move(ptr);
-        ptr = std::move(tmp_ptr);
-        std::atomic_uint* tmp_count_ptr = r.count_ptr;
-        r.count_ptr = count_ptr;
-        count_ptr = tmp_count_ptr;
+        T* Tmp(std::move(Object._Ptr));
+        Object._Ptr = std::move(_Ptr);
+        _Ptr = std::move(Tmp);
+        std::atomic_uint* TmpNumberOfPtr = Object._NumberOfPtr;
+        Object._NumberOfPtr = _NumberOfPtr;
+        _NumberOfPtr = TmpNumberOfPtr;
     }
 
     auto use_count() const -> size_t
     {
-        if (count_ptr)
+        if (_NumberOfPtr)
         {
-            return *count_ptr;
+            return *_NumberOfPtr;
         }
         else
         {
@@ -199,8 +201,10 @@ public:
     }
 
 private:
-    T* ptr;
-    std::atomic_uint* count_ptr;
+
+    T* _Ptr;
+    std::atomic_uint* _NumberOfPtr;
+
 };
 
 #endif //INCLUDE_SHAREDPTR_HPP_
